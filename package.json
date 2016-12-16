@@ -2,7 +2,7 @@
   "name": "idle-queue-worker",
   "version": "0.0.3",
   "description": "Simple queue worker based on requestIdleCallback",
-  "main": "src/index.js",
+  "main": "examples/src/index.js",
   "scripts": {
     "build": "npm run build:clean && npm run build:lib && npm run build:flow",
     "build:clean": "rimraf lib",
@@ -24,10 +24,12 @@
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-core": "^6.20.0",
+    "babel-loader": "^6.2.10",
     "babel-plugin-transform-flow-strip-types": "^6.18.0",
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-stage-0": "^6.16.0",
     "flow-copy-source": "^1.1.0",
-    "rimraf": "^2.5.4"
+    "rimraf": "^2.5.4",
+    "webpack": "^1.14.0"
   }
 }

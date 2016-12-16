@@ -10,20 +10,23 @@ const defaultIsReady = () => true;
 
 export default class QueueWorker<T> {
     queue:Array<T>;
-    callback:Callback<T>;
+    callback:?Callback<T>;
     isReady:IsReady;
     timeout:number;
     isScheduled:boolean;
     task:?number;
 
-    constructor(callback:Callback<T>, isReady:IsReady = defaultIsReady, queue:Array<T> = [], timeout:number = 3000) {
+    constructor(isReady:IsReady = defaultIsReady, queue:Array<T> = [], timeout:number = 3000) {
         this.queue = queue;
-        this.callback = callback;
         this.isReady = isReady;
         this.timeout = timeout;
         this.isScheduled = false;
 
         this.task = null;
+    }
+
+    register(callback:Callback<T>):void {
+        this.callback = callback;
 
         if (this.queue.length) {
             this.schedule();
@@ -55,8 +58,12 @@ export default class QueueWorker<T> {
             return this.schedule();
         }
 
+        const { callback } = this;
+
         while (deadline.timeRemaining() > 0 && this.queue.length > 0) {
-            this.callback(this.queue.shift());
+            if (callback) {
+                callback(this.queue.shift());
+            }
         }
 
         this.schedule();
