@@ -1,5 +1,7 @@
 #IdleQueueWorker
 
+**(WARNING! Still experimental library!)**
+
 Simple async queue implementation for low priority background tasks, such as analytics sending, data collecting.
 
 Queue processing implemented over [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback) (shim included) that provides task processing on the main event loop, without impacting latency-critical events.
@@ -53,12 +55,11 @@ worker.enqueue(2);
 
 
 
-**ForEachable(...baseQueueWorkerArgs)<T>**
+**`ForEachable(...baseQueueWorkerArgs)<T>`**
 
 Methods:
 
- - ```.forEach(callback: (item:T) => any):void``` — just forEach
-   callback function
+ - ```.forEach(callback: (item:T) => any):void``` — callback function applied for each dequeued element
  - ```.enqueue(item:T):void``` — proxy of baseQueueWorker method
  - ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of map
    function to next queue
@@ -74,7 +75,7 @@ worker.forEach(x => x * x);
 
 
 
-**Mapable(...baseQueueWorkerArgs)<T,R>**
+**`Mapable(...baseQueueWorkerArgs)<T,R>`**
 
 Methods:
 
@@ -98,14 +99,14 @@ worker
 
 
 
-**Foldable(...baseQueueWorkerArgs)<T,R>**
+**`Foldable(...baseQueueWorkerArgs)<T,R>`**
 
 Methods:
 
 - ```.enqueue(item:T):void``` — proxy of baseQueueWorker method
-- ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of map function to next queue
-- ```.fold(callback:(accumulator:R, item:T) => R, initialValue:R):Self``` — just another fold function
-- ```.take(count:number).Promise<Array<R>>``` — take first N processed items of queue
+- ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of folding to next queue (passed once)
+- ```.fold(callback:(accumulator:R, item:T) => R, initialValue:R):Self``` — same as Array.prototype.reduce function
+- ```.foldUntil(count:number).Promise<Array<R>>``` — foldResult while predicate is trustly
 
 Example:
 
@@ -116,16 +117,43 @@ const worker = new Foldable();
 
 worker
 	.fold((sum, value) => sum * value, 1)
-	.take(10)
+	.foldUntil(sum => sum > 10)
 	.then(result => send(result));
+```
+
+**Piping**:
+
+You can pass the results of one queue to next queue just call .pipe method of Mapable, Foldable instances. There is many  opportunities to determine your data flow with queues without pain.
+
+Example:
+
+```javascript
+import { ForEachable, Mapable, Foldable } from 'idle-queue-worker/lib';
+
+const mapableWorker = new Mapable();
+const forEachableWorker = new ForEachable();
+const foldableWorker = new Foldable();
+
+foldableWorker
+    .fold((result, element) => result + element, 0)
+    .foldUntil(result => result > 10)
+
+mapableWorker
+    .map(e => e * 2)
+    .pipe(foldableWorker)
+    .pipe(forEachableWorker)
+    .forEach(e => console.log(e));
+
+mapableWorker
+    .take(5)
+    .then(result => console.log('DONE!'));
 ```
 
 
 
 ##TODO
-
+ - `Filterable<T>`
  - Node  support
  - Tests
  - Live examples
  - A lot of improvements!
-

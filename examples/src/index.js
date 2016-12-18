@@ -1,18 +1,25 @@
-// @flow
+import { ForEachable, Mapable, Foldable } from '../../src';
 
-import Mapable from '../../src/Mapable';
-import ForEachable from '../../src/ForEachable';
+const mapableWorker = new Mapable();
+const foreachableWorker = new ForEachable();
+const foldableWorker = new Foldable();
 
-const worker = new Mapable();
-const anotherWorker = new ForEachable();
-
-worker
+mapableWorker
     .map(e => e * 2)
-    .pipe(anotherWorker)
+    .pipe(foreachableWorker)
     .forEach(e => console.log(e));
 
-worker
-    .take(10)
+mapableWorker
+    .take(5)
     .then(result => console.log(result));
 
-new Array(100).fill(0).forEach((_, i) => worker.enqueue(i));
+foldableWorker
+    .fold((result, element) => result + element, 0)
+    .pipe(foreachableWorker);
+
+foldableWorker
+    .foldUntil(result => result > 10)
+    .then(result => console.log('DONE'))
+
+new Array(5).fill(0).forEach((_, i) => mapableWorker.enqueue(i));
+[1, 5, 2, 1, 5].forEach(number => foldableWorker.enqueue(number));

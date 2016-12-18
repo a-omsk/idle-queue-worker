@@ -3,7 +3,6 @@
 import QueueWorker from './QueueWorker';
 
 type Callback<T, R> = (item:T) => R;
-
 type Handler<R> = (item:R) => any;
 
 interface QueueInterface<T> {
