@@ -1,6 +1,6 @@
 {
   "name": "idle-queue-worker",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Simple queue worker based on requestIdleCallback",
   "main": "examples/src/index.js",
   "scripts": {
