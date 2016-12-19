@@ -14,14 +14,12 @@ export default class Foldable<T,R> {
     result: ?R;
     handlers: Array<Handler<R>>;
     terminated: boolean;
-    passThrough: ?Handler<R>;
 
     constructor(...args:Array<any>) {
         this.worker = new QueueWorker(...args);
         this.result = null;
         this.handlers = [];
         this.terminated = false;
-        this.passThrough = null;
     }
 
     enqueue(item:T):Foldable<T,R> {
@@ -30,7 +28,9 @@ export default class Foldable<T,R> {
     }
 
     pipe(queue:QueueInterface<R>):QueueInterface<R> {
-        this.passThrough = (item:R) => queue.enqueue(item);
+        this.handlers.push((item:R) => {
+            queue.enqueue(item);
+        });
 
         return queue;
     }
@@ -57,7 +57,6 @@ export default class Foldable<T,R> {
                     return;
                 }
                                        
-                this.passThrough && this.passThrough(this.result);
                 resolve(this.result);
                 this.terminate(); 
             });

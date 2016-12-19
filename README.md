@@ -104,9 +104,9 @@ worker
 Methods:
 
 - ```.enqueue(item:T):void``` — proxy of baseQueueWorker method
-- ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of folding to next queue (passed once)
+- ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of folding to next queue
 - ```.fold(callback:(accumulator:R, item:T) => R, initialValue:R):Self``` — same as Array.prototype.reduce function
-- ```.foldUntil(count:number).Promise<Array<R>>``` — foldResult while predicate is trustly
+- ```.foldUntil(count:number):Promise<R>``` — foldResult until predicate falsy
 
 Example:
 
