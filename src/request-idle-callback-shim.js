@@ -18,8 +18,7 @@ const requestIdleCallbackShim = (cb:(item:Deadline) => any) => {
 
 const cancelIdleCallbackShim = (id:number) => clearTimeout(id);
 
-window.requestIdleCallback = window.requestIdleCallback || requestIdleCallbackShim;
-window.cancelIdleCallback = window.cancelIdleCallback || cancelIdleCallbackShim;
+const hasSupport = typeof window !== 'undefined' && window.hasOwnProperty('requestIdleCallback');
 
-export const requestIdleCallback = window.requestIdleCallback;
-export const cancelIdleCallback = window.cancelIdleCallback;
+export const requestIdleCallback = hasSupport ? window.requestIdleCallback : requestIdleCallbackShim;
+export const cancelIdleCallback = hasSupport ? window.cancelIdleCallback : cancelIdleCallbackShim;

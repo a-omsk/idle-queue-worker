@@ -15,7 +15,8 @@ export default class ForEachable<T> {
         this.worker.enqueue(item);
     }
 
-    forEach(callback:Callback<T>) {
+    forEach(callback:Callback<T>):ForEachable<T> {
         this.worker.register(callback);
+        return this;
     }
 }
