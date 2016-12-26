@@ -14,7 +14,7 @@ export default class QueueWorker<T> {
     isReady:IsReady;
     timeout:number;
     isScheduled:boolean;
-    task:?number;
+    task:any;
 
     constructor(isReady:IsReady = defaultIsReady, queue:Array<T> = [], timeout:number = 3000) {
         this.queue = queue;

@@ -11,7 +11,7 @@ interface QueueInterface<T> {
 
 export default class Foldable<T,R> {
     worker: QueueWorker<T>;
-    result: ?R;
+    result: R | null;
     handlers: Array<Handler<R>>;
     terminated: boolean;
 
@@ -44,16 +44,16 @@ export default class Foldable<T,R> {
     fold(callback:FoldFn<T,R>, initialValue:R):Foldable<T,R> {
         this.worker.register((item:T) => {
             this.result = [item].reduce(callback, this.result || initialValue);
-            this.handlers.forEach(handler => this.result && handler(this.result));
+            this.handlers.forEach(handler => this.result !== null && handler(this.result));
         });
 
         return this;
     }
 
-    foldUntil(predicate:(item:R) => boolean):Promise<R> {
+    foldUntil(predicate:(item:R) => boolean):Promise<?R> {
         return new Promise(resolve => {
             this.handlers.push((item:R) => {
-                if (!predicate(item) || !this.result) {
+                if (!predicate(item)) {
                     return;
                 }
                                        

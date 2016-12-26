@@ -153,7 +153,5 @@ mapableWorker
 
 ##TODO
  - `Filterable<T>`
- - Node  support
- - Tests
  - Live examples
  - A lot of improvements!
