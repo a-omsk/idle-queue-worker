@@ -85,7 +85,7 @@ worker.forEach(x => x * x);
 Methods:
 
 - ```.map(callback: (item:T) => R):Self``` — a → b callback function
-- ```.take(count:number).Promise<Array<R>>``` — take first N processed items of queue
+- ```.take(count:number):Promise<Array<R>>``` — take first N processed items of queue
 - ```.takeUntil(predicate:(item:R) => boolean):Promise<Array<R>>``` — collect data until predicate result is falsy, then resolve result
 
 Example:
