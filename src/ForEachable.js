@@ -1,22 +1,16 @@
 // @flow
 
-import QueueWorker from './QueueWorker';
+import Abstract from './Abstract';
 
 type Callback<T> = (item:T) => any;
 
-export default class ForEachable<T> {
-    worker:QueueWorker<T>;
-
-    constructor(...args:Array<any>) {
-        this.worker = new QueueWorker(...args);
-    }
-
-    enqueue(item:T) {
-        this.worker.enqueue(item);
-    }
-
+export default class ForEachable<T> extends Abstract<T, T> {
     forEach(callback:Callback<T>):ForEachable<T> {
-        this.worker.register(callback);
+        this.worker.register((item:T) => {
+            callback(item);
+            this.handlers.forEach(handler => handler(item));
+        });
+
         return this;
     }
 }

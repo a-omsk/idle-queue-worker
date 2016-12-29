@@ -1,47 +1,23 @@
 // @flow
 
-import QueueWorker from './QueueWorker';
+import Abstract from './Abstract';
 
-type FoldFn<T,R> = (accumulator:R, element:T) => R;
-type Handler<R> = (item:R) => any;
+type FoldFn<T, R> = (accumulator:R, element:T) => R;
 
-interface QueueInterface<T> {
-    enqueue(item:T): any
-}
-
-export default class Foldable<T,R> {
-    worker: QueueWorker<T>;
+export default class Foldable<T, R> extends Abstract<T, R> {
     result: R | null;
-    handlers: Array<Handler<R>>;
-    terminated: boolean;
 
     constructor(...args:Array<any>) {
-        this.worker = new QueueWorker(...args);
+        super(...args);
         this.result = null;
-        this.handlers = [];
-        this.terminated = false;
-    }
-
-    enqueue(item:T):Foldable<T,R> {
-        this.worker.enqueue(item);
-        return this;
-    }
-
-    pipe(queue:QueueInterface<R>):QueueInterface<R> {
-        this.handlers.push((item:R) => {
-            queue.enqueue(item);
-        });
-
-        return queue;
     }
 
     terminate():void {
-        this.terminated = true;
+        super.terminate();
         this.result = null;
-        this.handlers = [];
     }
 
-    fold(callback:FoldFn<T,R>, initialValue:R):Foldable<T,R> {
+    fold(callback:FoldFn<T, R>, initialValue:R):Foldable<T, R> {
         this.worker.register((item:T) => {
             this.result = [item].reduce(callback, this.result || initialValue);
             this.handlers.forEach(handler => this.result !== null && handler(this.result));
@@ -56,9 +32,9 @@ export default class Foldable<T,R> {
                 if (!predicate(item)) {
                     return;
                 }
-                                       
+
                 resolve(this.result);
-                this.terminate(); 
+                this.terminate();
             });
         });
     }

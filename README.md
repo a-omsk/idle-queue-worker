@@ -6,6 +6,8 @@ Simple async queue implementation for low priority background tasks, such as ana
 
 Queue processing implemented over [window.requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback) (shim included) that provides task processing on the main event loop, without impacting latency-critical events.
 
+This module has no any external dependencies and some part  of code base already used in production, enjoy.
+
 
 
 ## Installation
@@ -17,9 +19,9 @@ Queue processing implemented over [window.requestIdleCallback](https://developer
 
 ## Documentation
 Module provides a few interfaces: ```ForEachable```, ```Mapable```, ```Foldable```.
-If you want to create your own interface, use ```BaseQueueWorker``` and object composition concept.
+If you want to create your own interface, use ```QueueWorker``` and object composition concept.
 
-For lot of cases you just need only two methods:
+For lot of cases you just need ```ForEachable``` interface and only two methods:
 
 
 `forEach` → for  dequeued data processing
@@ -30,9 +32,9 @@ For lot of cases you just need only two methods:
 
 ##API
 
-**`BaseQueueWorker<T>(isReady?:() => boolean, timeout?:number, queue?:Array<T>)`**
+**`QueueWorker<T>(isReady?:() => boolean, timeout?:number, queue?:Array<T>)`**
 
-Params ( aka *baseQueueWorkerArgs*):
+Params ( aka *queueWorkerArgs*):
 
  - `isReady` — call before each attempt of queue item processing. If result is falsy, then next new work will be sheduled.
  -  `timeout (given in ms)` — minimum time that must pass before calling the callback function.
@@ -45,24 +47,27 @@ Methods:
 
 Example:
 ```javascript
-import { BaseQueueWorker } from 'idle-queue-worker/lib';
+import { QueueWorker } from 'idle-queue-worker/lib';
 
-const worker = new BaseQueueWorker();
+const worker = new QueueWorker();
 
 worker.register(x => x * x);
 worker.enqueue(2);
 ```
 
+**`Abstract(...queueWorkerArgs)<T,R>`**
 
+Methods:
+ - ```.enqueue(item:T):void``` — proxy of queueWorker method
+ - ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of callback function to next queue
 
-**`ForEachable(...baseQueueWorkerArgs)<T>`**
+You can't construct Abstact instance directly, use classes below.
+
+**`ForEachable(...queueWorkerArgs)<T>`**
 
 Methods:
 
  - ```.forEach(callback: (item:T) => any):void``` — callback function applied for each dequeued element
- - ```.enqueue(item:T):void``` — proxy of baseQueueWorker method
- - ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of map
-   function to next queue
 
 Example:
 ```javascript
@@ -75,13 +80,11 @@ worker.forEach(x => x * x);
 
 
 
-**`Mapable(...baseQueueWorkerArgs)<T,R>`**
+**`Mapable(...queueWorkerArgs)<T,R>`**
 
 Methods:
 
 - ```.map(callback: (item:T) => R):Self``` — a → b callback function
-- ```.enqueue(item:T):void``` — proxy of baseQueueWorker method
-- ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of map function to next queue
 - ```.take(count:number).Promise<Array<R>>``` — take first N processed items of queue
 - ```.takeUntil(predicate:(item:R) => boolean):Promise<Array<R>>``` — collect data until predicate result is falsy, then resolve result
 
@@ -99,12 +102,10 @@ worker
 
 
 
-**`Foldable(...baseQueueWorkerArgs)<T,R>`**
+**`Foldable(...queueWorkerArgs)<T,R>`**
 
 Methods:
 
-- ```.enqueue(item:T):void``` — proxy of baseQueueWorker method
-- ```.pipe(queue:AnotherQueue):AnotherQueue``` — enqueue result of folding to next queue
 - ```.fold(callback:(accumulator:R, item:T) => R, initialValue:R):Self``` — same as Array.prototype.reduce function
 - ```.foldUntil(count:number):Promise<R>``` — foldResult until predicate falsy
 
@@ -123,7 +124,7 @@ worker
 
 **Piping**:
 
-You can pass the results of one queue to next queue just call .pipe method of Mapable, Foldable instances. There is many  opportunities to determine your data flow with queues without pain.
+You can pass the results of one queue to next queue just call .pipe method of ```ForEachable```, ```Mapable```, ```Foldable``` instances. There is many  opportunities to determine your data flow with queues without pain.
 
 Example:
 
@@ -152,6 +153,5 @@ mapableWorker
 
 
 ##TODO
- - `Filterable<T>`
  - Live examples
  - A lot of improvements!

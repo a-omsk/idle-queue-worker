@@ -1,0 +1,33 @@
+{
+  "parser": "babel-eslint",
+  "extends": "airbnb-base",
+
+  "env": {
+    "browser": true,
+    "jest": true
+  },
+  "plugins": [
+    "flowtype"
+  ],
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
+  "rules": {
+    "indent": [2, 4, {"SwitchCase": 1}],
+    "linebreak-style": [2, "unix"],
+    "flowtype/require-parameter-type": 0,
+    "flowtype/define-flow-type": 1,
+    "flowtype/use-flow-type": 1,
+    "flowtype/valid-syntax": 1,
+    "flowtype/union-intersection-spacing": [
+      2,
+      "always"
+    ],
+    "arrow-parens": "off",
+    "comma-dangle": "off",
+    "max-len": [0, 140, 2],
+    "no-prototype-builtins": "off"
+  }
+}

@@ -55,7 +55,8 @@ export default class QueueWorker<T> {
 
     idleHandler = (deadline:Deadline):void => {
         if (!this.isReady()) {
-            return this.schedule();
+            this.schedule();
+            return;
         }
 
         const { callback } = this;

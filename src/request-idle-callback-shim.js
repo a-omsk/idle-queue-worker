@@ -21,7 +21,7 @@ const requestIdleCallbackShim = (cb:(item:Deadline) => any) => {
 const cancelIdleCallbackShim = (id:any) => {
     const cancellator = hasSetImmediate ? global.clearImmediate : clearTimeout;
     cancellator(id);
-}
+};
 
 export const requestIdleCallback = hasSupport ? window.requestIdleCallback : requestIdleCallbackShim;
 export const cancelIdleCallback = hasSupport ? window.cancelIdleCallback : cancelIdleCallbackShim;
